@@ -31,6 +31,39 @@ class App extends Component {
     });
   }
 
+  toggleTodoDone(event, index) {
+    const todos = [...this.state.todos]; // copy the array
+    todos[index] = {...todos[index]}; // copy the todo obj (modify the obj at the given index)
+    todos[index].done = event.target.checked; // update done property on the copied todo
+    this.setState({
+      todos
+    });
+    console.log(event.target.checked)
+    console.log(this.state.todos[index].done);
+  } 
+
+  removeTodo(index) {
+    const todos = [...this.state.todos]; // this [...] syntax gives us a new array
+    todos.splice(index, 1);
+
+    this.setState({
+      todos
+    });
+  }
+
+  allDone() {
+    const todos = this.state.todos.map(todo => {
+      return {
+        ...todo, // we take all the contents and COPY. Always copy!
+        done: true
+      };
+    }); // map gives us a new array
+
+    this.setState({ // think of setState as kind of like a return?! :)
+      todos
+    });
+  }
+
   render() {
     return (
       <div className="App">
@@ -41,11 +74,17 @@ class App extends Component {
             <button type="submit">Add Todo</button>
           </form>
 
+          <button onClick={() => this.allDone()}>All done!</button>
+
           <ul>
-            {this.state.todos.map(todo => { // wouldnt the map here result in an array? so we have <ul> [array] </ul>.. how is this rendered?
-              return <li key={todo.title}>{todo.title}</li>
+            {this.state.todos.map((todo, index) => { // wouldnt the map here result in an array? so we have <ul> [array] </ul>.. how is this rendered?
+              return (<li key={todo.title}>
+                <input onChange={(event) => this.toggleTodoDone(event, index)} type="checkbox" checked={todo.done}/>
+                <span style={{ textDecoration: todo.done ? 'line-through' : 'inherit'}}>{todo.title}</span> {/* line through! */}
+                <button onClick={() => this.removeTodo(index)}>Remove</button>
+                </li>)
             })}
-          </ul>
+          </ul> 
       </div>
     );
   }
@@ -66,3 +105,7 @@ export default App;
 //  --> doing it this way, when we use setState, it's a new array. not the same array that's being pushed into
 //  --> Think of how you can set a [] to const, you can change whatever is inside it but it's still []. We want to make new [] every time
 // ALSO we are only updating todos instead of the WHOLE DOM when we setState({todo: ...etc}); It's the only key we are passing.
+
+// FOR STYLING:
+// we can use <span style={ { } } and whatever is inside the {} is CSS. KEYWORD: style
+// or we can use <span className={ done ? 'done' : '' } This is like addClass. KEYWORD: className
